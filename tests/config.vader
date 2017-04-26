@@ -106,3 +106,13 @@ Execute (neomake#config#get handles Funcref variables):
   AssertEqual neomake#config#get_with_source('b:function'), [Funcref, 'buffer']
 
   bwipe
+
+Execute (neomake#config#{un,}set_dict):
+  let foo = {}
+  call neomake#config#set_dict(foo, 'bar.baz', 42)
+  AssertEqual foo, {'bar': {'baz': 42}}
+
+  call neomake#config#unset_dict(foo, 'bar.baz')
+  AssertEqual foo, {'bar': {}}
+  call neomake#config#unset_dict(foo, 'bar')
+  AssertEqual foo, {}

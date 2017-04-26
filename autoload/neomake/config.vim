@@ -128,3 +128,20 @@ function! neomake#config#set_buffer(bufnr, name, value) abort
   endif
   return s:set(bneomake, a:name, a:value)
 endfunction
+
+" Set a:name (resolved on dots) to a:value in a:scope.
+" This is meant for advanced usage, e.g.:
+"   set_scope(t:, 'neomake.disabled', 1)
+function! neomake#config#set_dict(dict, name, value) abort
+  return s:set(a:dict, a:name, a:value)
+endfunction
+
+" Unset a:name (resolved on dots).
+" This is meant for advanced usage, e.g.:
+"   unset_dict(t:, 'neomake.disabled', 1)
+function! neomake#config#unset_dict(dict, name) abort
+  let [c, k] = s:resolve_name(a:dict, a:name)
+  if has_key(c, k)
+    unlet c[k]
+  endif
+endfunction

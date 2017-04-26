@@ -49,6 +49,7 @@ function! neomake#config#get(name, ...) abort
 
   for lookup in [
         \ getbufvar(bufnr, 'neomake'),
+        \ get(t:, 'neomake', {}),
         \ get(g:, 'neomake', {}),
         \ get(context, 'maker', {})]
     if !empty(lookup)

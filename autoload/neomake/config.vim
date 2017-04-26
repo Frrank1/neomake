@@ -63,6 +63,42 @@ function! neomake#config#get(name, ...) abort
   return Default
 endfunction
 
+" Get a:name from config with information about the setting's source.
+" This is mostly the same as neomake#config#get, but kept seperate since it
+" is not used as much (?!).
+" Optional args:
+"  - a:1: default
+"  - a:2: context
+function! neomake#config#get_with_source(name, ...) abort
+  let Default = a:0 ? a:1 : g:neomake#config#undefined
+  let context = a:0 > 1 ? a:2 : {}
+  if a:name =~# '^b:'
+    if !has_key(context, 'bufnr')
+      let context.bufnr = bufnr('%')
+    endif
+    let name = a:name[2:-1]
+  else
+    let name = a:name
+  endif
+  let bufnr = has_key(context, 'bufnr') ? context.bufnr : bufnr('%')
+
+  for [source, lookup] in [
+        \ ['buffer', getbufvar(bufnr, 'neomake')],
+        \ ['tab', get(t:, 'neomake', {})],
+        \ ['global', get(g:, 'neomake', {})],
+        \ ['maker', get(context, 'maker', {})]]
+    if !empty(lookup)
+      let R = s:get(lookup, name, context)
+      if R isnot# g:neomake#config#undefined
+        return [R, source]
+      endif
+    endif
+    unlet! lookup R  " old vim
+  endfor
+  return [Default, 'default']
+endfunction
+
+
 " Set a:name in a:dict to a:value, after resolving it (split on dots).
 function! s:set(dict, name, value) abort
   let [c, k] = s:resolve_name(a:dict, a:name)
